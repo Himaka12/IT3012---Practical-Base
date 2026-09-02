@@ -10,3 +10,22 @@ class GreedyGridAgent:
         pos = percept['agent_pos']
         # Simple heuristic or fallback random sweep
         return random.choice(self.actions_pool)
+
+class SimpleReflexAgent:
+
+    def sense_and_act(self, percept: dict) -> str:
+        direction = percept['facing_direction']
+
+        if percept['food_here']:
+            return direction
+
+        if percept['wall_ahead']:
+            turns = {
+                'Up': 'Left',
+                'Left': 'Down',
+                'Down': 'Right',
+                'Right': 'Up'
+            }
+            return turns[direction]
+
+        return direction
