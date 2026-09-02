@@ -237,6 +237,76 @@ class SearchAgent:
 
         return []
 
+    def astar_search(self, start_pos, goal_pos, walls, grid_size, heuristic_type='manhattan'):
+        frontier = []
+        reached_states = set()
+
+        if heuristic_type == 'euclidean':
+            h_cost = self.euclidean_distance(start_pos, goal_pos)
+        else:
+            h_cost = self.manhattan_distance(start_pos, goal_pos)
+
+        heapq.heappush(
+            frontier,
+            (h_cost, 0, start_pos, [])
+        )
+
+        while frontier:
+            f_cost, g_cost, current_pos, path = heapq.heappop(frontier)
+
+            if current_pos == goal_pos:
+                return path
+
+            if current_pos in reached_states:
+                continue
+
+            reached_states.add(current_pos)
+
+            x, y = current_pos
+
+            moves = [
+                ('Up', (x, y + 1)),
+                ('Down', (x, y - 1)),
+                ('Left', (x - 1, y)),
+                ('Right', (x + 1, y))
+            ]
+
+            for action, next_pos in moves:
+                nx, ny = next_pos
+
+                if (
+                    0 <= nx < grid_size[0]
+                    and 0 <= ny < grid_size[1]
+                    and next_pos not in walls
+                    and next_pos not in reached_states
+                ):
+                    new_g_cost = g_cost + 1
+
+                    if heuristic_type == 'euclidean':
+                        new_h_cost = self.euclidean_distance(
+                            next_pos,
+                            goal_pos
+                        )
+                    else:
+                        new_h_cost = self.manhattan_distance(
+                            next_pos,
+                            goal_pos
+                        )
+
+                    new_f_cost = new_g_cost + new_h_cost
+
+                    heapq.heappush(
+                        frontier,
+                        (
+                            new_f_cost,
+                            new_g_cost,
+                            next_pos,
+                            path + [action]
+                        )
+                    )
+
+        return []
+
     def sense_and_act(self, percept: dict) -> str:
         # Update current position from the previous action
         if self.last_action is not None:
