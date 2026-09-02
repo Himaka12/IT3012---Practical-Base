@@ -117,7 +117,7 @@ class SearchAgent:
 
     def __init__(self):
         self.plan = []
-        self.active_algo = 'BFS'
+        self.active_algo = 'AStar'
         self.current_pos = (0, 0)
         self.last_action = None
 
@@ -356,6 +356,13 @@ class SearchAgent:
                 )
             elif self.active_algo == 'UCS':
                 self.plan = self.ucs_search(
+                    self.current_pos,
+                    goal_pos,
+                    walls,
+                    grid_size
+                )
+            elif self.active_algo == 'AStar':
+                self.plan = self.astar_search(
                     self.current_pos,
                     goal_pos,
                     walls,
