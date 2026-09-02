@@ -35,6 +35,15 @@ class VisualGridHuntGame:
             if tuple(op_pos) != (0, 0) and tuple(op_pos) not in self.walls and tuple(op_pos) not in self.food_positions:
                 self.opponents.append(op_pos)
 
+        # Generate toxic traps
+        self.toxic_traps = set()
+        while len(self.toxic_traps) < 3:
+            tx = random.randint(0, self.width - 1)
+            ty = random.randint(0, self.height - 1)
+            trap_pos = (tx, ty)
+            if trap_pos != (0, 0) and trap_pos not in self.walls and trap_pos not in self.food_positions:
+                self.toxic_traps.add(trap_pos)       
+
         self.score = 0
         self.steps = 0
         self.collision = False
@@ -145,6 +154,20 @@ class GridGameGUI:
             y1 = (self.env.height - 1 - fy) * self.cell_size + offset
             self.canvas.create_oval(x1, y1, x1 + self.cell_size * 0.5, y1 + self.cell_size * 0.5, fill="#f59e0b",
                                     outline="#d97706")
+
+        for fx, fy in self.env.food_positions:
+            offset = self.cell_size * 0.25
+            x1 = fx * self.cell_size + offset
+            y1 = (self.env.height - 1 - fy) * self.cell_size + offset
+            self.canvas.create_oval(x1, y1, x1 + self.cell_size * 0.5, y1 + self.cell_size * 0.5, fill="#f59e0b",
+                                    outline="#d97706")
+
+         # Draw toxic traps
+        for tx, ty in self.env.toxic_traps:
+            offset = self.cell_size * 0.25
+            x1 = tx * self.cell_size + offset
+            y1 = (self.env.height - 1 - ty) * self.cell_size + offset
+            self.canvas.create_rectangle(x1, y1, x1 + self.cell_size * 0.5, y1 + self.cell_size * 0.5, fill="purple")
 
         for ox, oy in self.env.opponents:
             offset = self.cell_size * 0.2
