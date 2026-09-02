@@ -78,7 +78,10 @@ class VisualGridHuntGame:
             'food_here': tuple(self.agent_pos) in self.food_positions,
             'smells_toxin': tuple(self.agent_pos) in self.toxic_traps,
             'collision': self.collision,
-            'facing_direction': self.facing_direction
+            'facing_direction': self.facing_direction,
+            'grid_size': (self.width, self.height),
+            'walls': list(self.walls),
+            'all_food': list(self.food_positions)
         }
 
     def execute_action(self, action: str):
