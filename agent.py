@@ -1,6 +1,7 @@
 # agent.py
 from collections import deque
 import heapq
+import math
 
 class GreedyGridAgent:
     """A simple agent that tries to move around systematically to clear the grid."""
@@ -119,6 +120,15 @@ class SearchAgent:
         self.active_algo = 'BFS'
         self.current_pos = (0, 0)
         self.last_action = None
+
+    def manhattan_distance(self, pos, goal):
+        return abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
+
+    def euclidean_distance(self, pos, goal):
+        return math.sqrt(
+            (pos[0] - goal[0]) ** 2
+            + (pos[1] - goal[1]) ** 2
+        )
 
     def bfs_search(self, start_pos, goal_pos, walls, grid_size):
         frontier = deque([(start_pos, [])])
