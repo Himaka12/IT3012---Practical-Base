@@ -114,6 +114,12 @@ class ModelBasedAgent:
 
 class SearchAgent:
 
+    def __init__(self):
+        self.plan = []
+        self.active_algo = 'BFS'
+        self.current_pos = (0, 0)
+        self.last_action = None
+
     def bfs_search(self, start_pos, goal_pos, walls, grid_size):
         frontier = deque([(start_pos, [])])
         reached = {start_pos}
@@ -220,3 +226,65 @@ class SearchAgent:
                     )
 
         return []
+
+    def sense_and_act(self, percept: dict) -> str:
+        # Update current position from the previous action
+        if self.last_action is not None:
+            x, y = self.current_pos
+
+            if self.last_action == 'Up':
+                y += 1
+            elif self.last_action == 'Down':
+                y -= 1
+            elif self.last_action == 'Left':
+                x -= 1
+            elif self.last_action == 'Right':
+                x += 1
+
+            self.current_pos = (x, y)
+            self.last_action = None
+
+        # Create a new plan when the current plan is empty
+        if not self.plan:
+            food_positions = percept['all_food']
+
+            if not food_positions:
+                return 'Up'
+
+            goal_pos = min(
+                food_positions,
+                key=lambda food: abs(food[0] - self.current_pos[0])
+                + abs(food[1] - self.current_pos[1])
+            )
+
+            walls = set(percept['walls'])
+            grid_size = percept['grid_size']
+
+            if self.active_algo == 'BFS':
+                self.plan = self.bfs_search(
+                    self.current_pos,
+                    goal_pos,
+                    walls,
+                    grid_size
+                )
+            elif self.active_algo == 'DFS':
+                self.plan = self.dfs_search(
+                    self.current_pos,
+                    goal_pos,
+                    walls,
+                    grid_size
+                )
+            elif self.active_algo == 'UCS':
+                self.plan = self.ucs_search(
+                    self.current_pos,
+                    goal_pos,
+                    walls,
+                    grid_size
+                )
+
+        if self.plan:
+            action = self.plan.pop(0)
+            self.last_action = action
+            return action
+
+        return 'Up'
