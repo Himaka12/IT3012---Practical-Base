@@ -2,6 +2,7 @@
 from collections import deque
 import heapq
 import math
+from logic_engine import KnowledgeBase
 
 class GreedyGridAgent:
     """A simple agent that tries to move around systematically to clear the grid."""
@@ -116,6 +117,10 @@ class ModelBasedAgent:
 class SearchAgent:
 
     def __init__(self):
+        self.kb = KnowledgeBase()
+        self.kb.tell_rule(['TargetVisible', 'HasDust'], 'SafeToEngage')
+        self.kb.tell_rule(['SafeToEngage', 'BloodseekerMissing'], 'Retreat')
+
         self.plan = []
         self.active_algo = 'AStar'
         self.current_pos = (0, 0)
