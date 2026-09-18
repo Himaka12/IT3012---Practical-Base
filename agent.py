@@ -242,7 +242,16 @@ class SearchAgent:
 
         return []
 
-    def astar_search(self, start_pos, goal_pos, walls, grid_size, heuristic_type='manhattan'):
+    def astar_search(self, start_pos, goal_pos, walls, grid_size,
+                     heuristic_type='manhattan', tile_percepts=None):
+        """Find a path, skipping tiles whose boolean percepts imply Retreat.
+
+        tile_percepts maps (x, y) coordinates to fact-name/boolean dictionaries.
+        Missing tiles supply no facts.
+        """
+        if tile_percepts is None:
+            tile_percepts = {}
+
         frontier = []
         reached_states = set()
 
@@ -285,6 +294,16 @@ class SearchAgent:
                     and next_pos not in walls
                     and next_pos not in reached_states
                 ):
+                    # Evaluate this tile independently of previous neighbors.
+                    self.kb.clear_facts()
+                    for fact, is_true in tile_percepts.get(next_pos, {}).items():
+                        if is_true:
+                            self.kb.tell_fact(fact)
+                    self.kb.forward_chain()
+
+                    if 'Retreat' in self.kb.facts:
+                        continue
+
                     new_g_cost = g_cost + 1
 
                     if heuristic_type == 'euclidean':
@@ -371,7 +390,8 @@ class SearchAgent:
                     self.current_pos,
                     goal_pos,
                     walls,
-                    grid_size
+                    grid_size,
+                    tile_percepts=percept.get('tile_percepts', {})
                 )
 
         if self.plan:
