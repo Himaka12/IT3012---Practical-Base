@@ -19,3 +19,16 @@ class KnowledgeBase:
     def clear_facts(self):
         """Clear current percepts while retaining the rules."""
         self.facts.clear()
+
+    def forward_chain(self):
+        """Deduce facts until a full pass over the rules adds nothing new."""
+        new_facts_added = True
+
+        while new_facts_added:
+            new_facts_added = False
+
+            for premises, conclusion in self.rules:
+                if conclusion not in self.facts:
+                    if all(premise in self.facts for premise in premises):
+                        self.facts.add(conclusion)
+                        new_facts_added = True
